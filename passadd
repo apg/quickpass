@@ -1,0 +1,25 @@
+#!/bin/bash
+# passadd
+
+if [ -z "$PASSFILE" ]
+then
+    echo "Please set the environment variable PASSFILE=/path/to/passwdfile"
+    exit 1
+fi
+
+if [ $# -ne 2 ]
+then
+    echo "usage: passadd [accountname] [description]"
+    exit 1
+else
+    t=$(tempfile) || exit
+    trap "shred -u -n 10 -z '$t'" EXIT
+    gpg --no-for-your-eyes-only -o $t -d $PASSFILE
+    read -s -p "password to save: " passwd
+    echo
+    echo "$2:$1:$passwd" >> $t
+    gpg -o $PASSFILE -c $t
+    shred -u -n 10 -z "$t"
+    trap - EXIT
+    exit
+fi

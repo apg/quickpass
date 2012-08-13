@@ -1,0 +1,16 @@
+#!/bin/bash
+# passlook
+
+if [ -z "$PASSFILE" ]
+then
+    echo "Please set the environment variable PASSFILE=/path/to/passwdfile"
+    exit 1 
+fi
+
+if [ $# -ne 1 ]
+then
+    echo "usage: passlook [which]"
+    exit 1
+else
+    gpg --for-your-eyes-only -d $PASSFILE | grep $1
+fi
